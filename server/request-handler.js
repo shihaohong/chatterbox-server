@@ -1,3 +1,4 @@
+var ObjectID = require('mongodb').ObjectID;
 /*************************************************************
 
 You should implement your request handler function in this file.
@@ -70,7 +71,9 @@ var requestHandler = function(request, response) {
     
     request.on('data', function(data1) {
       var parsedData = JSON.parse(data1 + '');
-      parsedData['objectId'] = Math.floor(Math.random() * 1000000); 
+      var objectId = new ObjectID();
+      parsedData['objectId'] = objectId;
+      console.log(objectId);
       obj.results.unshift(parsedData);    
     });
 
