@@ -31,7 +31,7 @@ var app = {
 
     // Poll for new messages
     setInterval(function() {
-      // app.fetch(true);
+      //app.fetch(true);
     }, 3000);
   },
 
@@ -64,15 +64,18 @@ var app = {
       contentType: 'application/json',
       success: function(data) {
         // Don't bother if we have nothing to work with
-        if (!data.results || !data.results.length) { return; }
+        if (!data.results || !data.results.length) { 
+          app.stopSpinner();
+          return; 
+        }
 
         // Store messages for caching later
         app.messages = data.results;
-
         // Get the last message
-        var mostRecentMessage = data.results[data.results.length - 1];
+        var mostRecentMessage = data.results[0];
 
         // Only bother updating the DOM if we have a new message
+      
         if (mostRecentMessage.objectId !== app.lastMessageId) {
           // Update the UI with the fetched rooms
           app.renderRoomList(data.results);
