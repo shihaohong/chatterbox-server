@@ -1,4 +1,6 @@
 var ObjectID = require('mongodb').ObjectID;
+var fs = require('fs');
+var path = require('path');
 /*************************************************************
 
 You should implement your request handler function in this file.
@@ -33,6 +35,34 @@ var obj = {
 };
 
 var requestHandler = function(request, response) {
+
+  /* ATTEMPT USING FS AND NODE GGGG
+  if (request.url === '/' || request.url.includes('?username')) {
+    var filePath = path.join(__dirname, '../client/index.html');
+    console.log('filepath', filePath); 
+    fs.readFile(filePath, 'utf8', function(err, data) {
+      console.log('error ----->', err);
+      response.writeHead(200, {'Content-Type': 'text/html'});
+      console.log('file data --------->', data);
+      response.write(data);
+      
+      response.end();
+    });
+  } else if (request.url.includes('.css')) {
+    console.log('requesting css file');
+    var filePath = path.join(__dirname, '../client', request.url);
+    console.log('filepath', filePath); 
+    fs.readFile(filePath, 'utf8', function(err, data) {
+      console.log('error ----->', err);
+      response.writeHead(200, {'Content-Type': 'text/css'});
+      console.log('file data --------->', data);
+      response.write(data);
+      console.log(request.url);
+      response.end();
+    });
+  } 
+  */ 
+
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -59,13 +89,14 @@ var requestHandler = function(request, response) {
   headers['Content-Type'] = 'application/json';
 
   // The outgoing status.
-  console.log(request.url);
   if (request.method === 'GET') {
     if (request.url.includes('/classes/messages')) {
       statusCode = 200;
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify(obj));
     } else {
       statusCode = 404;
-    }
+    } 
   } else if (request.method === 'POST') {
     statusCode = 201;
     
@@ -73,26 +104,15 @@ var requestHandler = function(request, response) {
       var parsedData = JSON.parse(data1 + '');
       var objectId = new ObjectID();
       parsedData['objectId'] = objectId;
-      console.log(objectId);
-      obj.results.unshift(parsedData);    
+      obj.results.unshift(parsedData);
     });
-
+    response.writeHead(statusCode, headers);
+    response.end(JSON.stringify(obj));
   } else if (request.method === 'OPTIONS') {
-    var statusCode = 200;
+    statusCode = 200;
+    response.writeHead(statusCode, headers);
+    response.end();
   }
-
-  // .writeHead() writes to the request line and headers of the response,
-  // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
-
-  // Make sure to always call response.end() - Node may not send
-  // anything back to the client until you do. The string you pass to
-  // response.end() will be the body of the response - i.e. what shows
-  // up in the browser.
-  //
-  // Calling .end "flushes" the response's internal buffer, forcing
-  // node to actually send all the data over to the client.
-  response.end(JSON.stringify(obj));
 };
 
 module.exports.requestHandler = requestHandler;
